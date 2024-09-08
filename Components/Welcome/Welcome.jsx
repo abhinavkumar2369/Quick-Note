@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { SafeAreaView , StatusBar, StyleSheet , Text, View , TouchableOpacity , FlatList , Image , Dimensions } from "react-native";
+import { StatusBar, StyleSheet , Text, View , TouchableOpacity , FlatList , Image , Dimensions } from "react-native";
 
 
 const { width } = Dimensions.get('window');
 import icon from './images/icon.png';
+
+
 
 const image_data = [
     {
@@ -36,10 +38,21 @@ const renderItem = ({ item }) => {
     )
 }
 
+
 const flatListRef = React.createRef();
 
 
-export default function Welcome() {
+
+export default function Welcome({navigation}) {
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const onMomentumScrollEnd = (event) => {
+        const newIndex = Math.floor(event.nativeEvent.contentOffset.x / width);
+        setCurrentIndex(newIndex);
+    };
+
+    
     return (
         <View style={styles.container}>
 
@@ -58,24 +71,26 @@ export default function Welcome() {
             {/* ---------------- Middle ----------------*/}
             <View style={styles.middle}>
                 <FlatList
-                        data={image_data}
-                        renderItem={renderItem}
-                        keyExtractor={item => item.id}
-                        horizontal
-                        pagingEnabled
-                        showsHorizontalScrollIndicator={false}
-                        ref={flatListRef}
-                        onMomentumScrollEnd={(event) => {
-                            const newIndex = Math.floor(event.nativeEvent.contentOffset.x / width);
-                            console.log(newIndex);
-                        }}
-                        style={{ width: width }}
-                    />
+                data={image_data}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                ref={flatListRef}
+                onMomentumScrollEnd={onMomentumScrollEnd}
+                style={{ width: width }}
+                />
+                    <View style={styles.flatlistindicator}>
+                        <View style={currentIndex === 0 ? styles.dotactive : styles.dotinactive}></View>
+                        <View style={currentIndex === 1 ? styles.dotactive : styles.dotinactive}></View>
+                        <View style={currentIndex === 2 ? styles.dotactive : styles.dotinactive}></View>
+                    </View>
             </View>
 
             {/* --------------- Lower ------------------*/}
             <View style={styles.lower}>
-                <TouchableOpacity onPress={() => setIsLoggedIn(true)} style={styles.getStarted}>
+                <TouchableOpacity onPress={() => navigation.navigate('Login')} style={styles.getStarted}>
                     <Text style={styles.button}>Get  Started</Text>
                 </TouchableOpacity>
             </View>
@@ -193,6 +208,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         alignItems: 'center',
         borderRadius: 20,
+        activeOpacity: 0.7, 
     },
     button:{
         // fontFamily: 'Roboto',
@@ -200,5 +216,39 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 20,
         letterSpacing: 0.5,
-    }
+    },
+    flatListRef:{
+        width: '100%',
+        height: 20,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // backgroundColor: 'red',
+    },
+    flatlistindicator: {
+        width: '100%',
+        flex: 1,
+        flexDirection: 'row',
+    },
+    dotactive:{
+        minHeight: 15,
+        minWidth: 30,
+        maxHeight: 15,
+        maxWidth: 15,
+        // fontSize: 60,
+        backgroundColor: '#3d43f5',
+        borderRadius: 30,
+        marginHorizontal: 5,
+    },
+    dotinactive:{
+        minHeight: 15,
+        minWidth: 15,
+        maxHeight: 15,
+        maxWidth: 15,
+        backgroundColor: '#d9d9d9',
+        fontSize: 30,
+        borderRadius: 30,
+        marginHorizontal: 5,
+    },
+    
 })
